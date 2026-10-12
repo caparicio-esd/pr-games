@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { VERBS_DATA } from './data/verbs';
 import { Verb, VerbAttempt, RoundSessionSummary, UserSettings, Achievement } from './types';
 import { MathSettings, MathGameMode, MathAttempt, MathSessionSummary } from './types/math';
+import { MultiSettings, MultiSessionMode, MultiAttempt, MultiSessionSummary } from './types/multiplication';
 import { storage } from './services/storage';
 import { mathStorage } from './services/mathStorage';
+import { multiStorage } from './services/multiplicationStorage';
 import { audio } from './utils/audio';
 
 // Hub
@@ -24,9 +26,15 @@ import { MathGameSession } from './components/math/MathGameSession';
 import { MathSummary } from './components/math/MathSummary';
 import { MathStatsView } from './components/math/MathStatsView';
 
+// Multiplication Game Components
+import { MultiLobby } from './components/multiplication/MultiLobby';
+import { MultiGameSession } from './components/multiplication/MultiGameSession';
+import { MultiSummary } from './components/multiplication/MultiSummary';
+import { MultiStatsView } from './components/multiplication/MultiStatsView';
+
 export function App() {
-  // Global suite navigation: 'hub' (landing page) | 'verbs' | 'math'
-  const [activeGame, setActiveGame] = useState<'hub' | 'verbs' | 'math'>('hub');
+  // Global suite navigation: 'hub' (landing page) | 'verbs' | 'math' | 'multi'
+  const [activeGame, setActiveGame] = useState<'hub' | 'verbs' | 'math' | 'multi'>('hub');
 
   // ==========================================
   // VERBS GAME STATE
@@ -50,6 +58,15 @@ export function App() {
   const [mathMode, setMathMode] = useState<MathGameMode>('block');
   const [mathSummary, setMathSummary] = useState<MathSessionSummary | null>(null);
   const [isMathStatsOpen, setIsMathStatsOpen] = useState(false);
+
+  // ==========================================
+  // MULTIPLICATION GAME STATE
+  // ==========================================
+  const [multiSettings, setMultiSettings] = useState<MultiSettings>(() => multiStorage.getSettings());
+  const [isMultiActive, setIsMultiActive] = useState(false);
+  const [multiMode, setMultiMode] = useState<MultiSessionMode>('block');
+  const [multiSummary, setMultiSummary] = useState<MultiSessionSummary | null>(null);
+  const [isMultiStatsOpen, setIsMultiStatsOpen] = useState(false);
 
   // Sync sound setting
   useEffect(() => {
@@ -172,6 +189,48 @@ export function App() {
     mathStorage.saveSettings(newSettings);
   };
 
+  // ==========================================
+  // MULTIPLICATION HANDLERS
+  // ==========================================
+  const handleStartMulti = (mode: MultiSessionMode) => {
+    setMultiMode(mode);
+    setIsMultiActive(true);
+    setMultiSummary(null);
+    setIsMultiStatsOpen(false);
+  };
+
+  const handleFinishMulti = (attempts: MultiAttempt[], highestStreak: number, score: number) => {
+    const total = attempts.length;
+    const correctCount = attempts.filter(a => a.isCorrect).length;
+    const accuracy = total > 0 ? Math.round((correctCount / total) * 100) : 0;
+    const totalTimeMs = attempts.reduce((sum, a) => sum + a.timeTakenMs, 0);
+    const avgTimeMs = total > 0 ? Math.round(totalTimeMs / total) : 0;
+
+    const summary: MultiSessionSummary = {
+      id: 'multi_' + Date.now(),
+      timestamp: Date.now(),
+      selectedTables: multiSettings.selectedTables,
+      questionMode: multiSettings.questionMode,
+      sessionMode: multiMode,
+      totalProblems: total,
+      correctCount,
+      accuracy,
+      score,
+      highestStreak,
+      avgTimeMs,
+      attempts,
+    };
+
+    multiStorage.saveSession(summary);
+    setMultiSummary(summary);
+    setIsMultiActive(false);
+  };
+
+  const handleUpdateMultiSettings = (newSettings: MultiSettings) => {
+    setMultiSettings(newSettings);
+    multiStorage.saveSettings(newSettings);
+  };
+
   const totalVerbScore = verbSessions.reduce((sum, s) => sum + s.score, 0);
   const totalVerbMastered = Object.values(verbStats).filter(
     s => (s.timesFlawless >= 2 && s.timesFailed === 0) || s.timesFlawless >= 3
@@ -191,6 +250,10 @@ export function App() {
               setIsMathActive(false);
               setMathSummary(null);
               setIsMathStatsOpen(false);
+            } else if (game === 'multi') {
+              setIsMultiActive(false);
+              setMultiSummary(null);
+              setIsMultiStatsOpen(false);
             }
           }}
         />
@@ -470,6 +533,47 @@ export function App() {
               onUpdateSettings={handleUpdateMathSettings}
               onStartGame={handleStartMath}
               onOpenStats={() => setIsMathStatsOpen(true)}
+              onBackToHub={() => setActiveGame('hub')}
+            />
+          )}
+        </main>
+      )}
+
+      {/* 4. MULTIPLICATION GAME VIEW */}
+      {activeGame === 'multi' && (
+        <main className="flex-1 pb-16">
+          {isMultiActive ? (
+            <MultiGameSession
+              settings={multiSettings}
+              mode={multiMode}
+              onFinish={handleFinishMulti}
+              onQuit={() => {
+                if (window.confirm('¿Salir del juego de tablas de multiplicar?')) {
+                  setIsMultiActive(false);
+                }
+              }}
+            />
+          ) : multiSummary ? (
+            <MultiSummary
+              summary={multiSummary}
+              onPlayAgain={() => handleStartMulti(multiMode)}
+              onViewStats={() => {
+                setMultiSummary(null);
+                setIsMultiStatsOpen(true);
+              }}
+              onBackToHub={() => setActiveGame('hub')}
+            />
+          ) : isMultiStatsOpen ? (
+            <MultiStatsView
+              onBackToLobby={() => setIsMultiStatsOpen(false)}
+              onStartGame={() => handleStartMulti('block')}
+            />
+          ) : (
+            <MultiLobby
+              settings={multiSettings}
+              onUpdateSettings={handleUpdateMultiSettings}
+              onStartGame={handleStartMulti}
+              onOpenStats={() => setIsMultiStatsOpen(true)}
               onBackToHub={() => setActiveGame('hub')}
             />
           )}
