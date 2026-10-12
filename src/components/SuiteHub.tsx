@@ -5,6 +5,7 @@ import { mathStorage } from '../services/mathStorage';
 import { multiStorage } from '../services/multiplicationStorage';
 import { squaresStorage } from '../services/squaresStorage';
 import { unitsStorage } from '../services/unitsStorage';
+import { PwaInstallBanner } from './PwaInstallBanner';
 
 interface SuiteHubProps {
   onSelectGame: (game: 'verbs' | 'math' | 'multi' | 'squares' | 'units') => void;
@@ -52,6 +53,9 @@ export const SuiteHub: React.FC<SuiteHubProps> = ({ onSelectGame }) => {
           Elige una aventura para entrenar tu cerebro, mejorar tus automatismos y conseguir nuevas medallas.
         </p>
       </div>
+
+      {/* PWA Install Banner */}
+      <PwaInstallBanner />
 
       {/* Game Selection Cards Grid (5 Games) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

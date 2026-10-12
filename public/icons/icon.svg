@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5"/>
+      <stop offset="50%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+    <linearGradient id="bolt" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="50%" stop-color="#fde047"/>
+      <stop offset="100%" stop-color="#eab308"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#0f172a" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Background rounded rectangle -->
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
+
+  <!-- Inner glowing circle -->
+  <circle cx="256" cy="256" r="190" fill="white" fill-opacity="0.12"/>
+
+  <!-- Educational elements -->
+  <!-- Playful lightning spark in center -->
+  <path d="M280 64 L160 272 L256 272 L232 448 L352 240 L256 240 Z" 
+        fill="url(#bolt)" 
+        filter="url(#shadow)"
+        stroke="#ffffff" 
+        stroke-width="12" 
+        stroke-linejoin="round"/>
+
+  <!-- Small star spark top right -->
+  <path d="M380 120 L388 144 L412 152 L388 160 L380 184 L372 160 L348 152 L372 144 Z" 
+        fill="#fef08a"/>
+
+  <!-- Small star spark bottom left -->
+  <path d="M130 360 L136 378 L154 384 L136 390 L130 408 L124 390 L106 384 L124 378 Z" 
+        fill="#ffffff" 
+        fill-opacity="0.9"/>
+</svg>
