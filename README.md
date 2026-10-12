@@ -1,12 +1,12 @@
 # ⚡ EduPlay Jr. - Suite de Juegos Educativos
 
-Una suite interactiva, visual y divertida diseñada para repasar y dominar los verbos irregulares en inglés, el cálculo mental y las tablas de multiplicar.
+Una suite interactiva, visual y divertida diseñada para repasar y dominar los verbos irregulares en inglés, el cálculo mental, las tablas de multiplicar, los cuadrados perfectos y el cambio de unidades métricas y tiempo.
 
 🌐 **Jugar online en GitHub Pages:** [https://caparicio-esd.github.io/pr-games/](https://caparicio-esd.github.io/pr-games/)
 
 ---
 
-## 🎮 Los 4 Juegos de la Suite
+## 🎮 Los 5 Juegos de la Suite
 
 ### 1. 🇬🇧 VerbMaster Jr. (Verbos Irregulares en Inglés)
 - Rellena el **Presente**, **Pasado** y **Participio** a partir del significado en español.
@@ -50,10 +50,24 @@ Una suite interactiva, visual y divertida diseñada para repasar y dominar los v
 - **Tabla de referencia interactiva**: chuleta visual con todos los cuadrados del 2 al 20.
 - **Métricas y dominio**: seguimiento individualizado de cada número del 2 al 20 con corona (👑) al dominarlo.
 
+### 5. 🪜 UnidadesPlay Jr. (Conversor de Unidades y Tiempo)
+- **Magnitudes incluidas**:
+  - **Masa ($g$)**: $mg, cg, dg, g, dag, hg, kg$ y tonelada ($1\text{ t} = 1000\text{ kg}$).
+  - **Longitud ($m$)**: $mm, cm, dm, m, dam, hm, km$.
+  - **Capacidad ($l$)**: $ml, cl, dl, l, dal, hl, kl$.
+  - **Superficie ($m^2$)**: $mm^2, cm^2, dm^2, m^2, dam^2, hm^2\text{ (ha)}, km^2$ (saltos de 100 por escalón).
+  - **Volumen ($m^3$) y Capacidad**: $m^3, dm^3, cm^3$ (saltos de 1000) y puentes clave ($1\ dm^3 = 1\ l$, $1\ cm^3 = 1\ ml$, $1\ m^3 = 1000\ l$).
+  - **Tiempo**: segundos ($s$), minutos ($min$), horas ($h$), días ($d$) con factores 60 y 24.
+- **4 Niveles de dificultad**: desde conversiones cotidianas y escaleras métricas básicas hasta superficie, volumen y magnitudes mixtas.
+- **Filtro de magnitud**: practica todas juntas o céntrate en una sola magnitud.
+- **Chuleta interactiva "La Escalera de Conversión"**: con pestañas interactivas, explicación de saltos de coma y reglas de oro.
+- **Teclado numérico táctil en pantalla**: con tecla para coma/punto decimal `,`.
+
 ---
 
 ## 🚀 Cómo ejecutar en local (Mac)
 
 - Ejecuta `./iniciar.sh` (o haz doble clic en él).
 - O ejecuta `npm run dev` y abre [http://localhost:5173](http://localhost:5173).
+
 

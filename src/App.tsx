@@ -4,10 +4,12 @@ import { Verb, VerbAttempt, RoundSessionSummary, UserSettings, Achievement } fro
 import { MathSettings, MathGameMode, MathAttempt, MathSessionSummary } from './types/math';
 import { MultiSettings, MultiSessionMode, MultiAttempt, MultiSessionSummary } from './types/multiplication';
 import { SquaresSettings, SquaresSessionMode, SquaresAttempt, SquaresSessionSummary } from './types/squares';
+import { UnitSettings, UnitSessionMode, UnitAttempt, UnitSessionSummary } from './types/units';
 import { storage } from './services/storage';
 import { mathStorage } from './services/mathStorage';
 import { multiStorage } from './services/multiplicationStorage';
 import { squaresStorage } from './services/squaresStorage';
+import { unitsStorage } from './services/unitsStorage';
 import { audio } from './utils/audio';
 
 // Hub
@@ -41,9 +43,15 @@ import { SquaresGameSession } from './components/squares/SquaresGameSession';
 import { SquaresSummary } from './components/squares/SquaresSummary';
 import { SquaresStatsView } from './components/squares/SquaresStatsView';
 
+// Units Game Components
+import { UnitsLobby } from './components/units/UnitsLobby';
+import { UnitsGameSession } from './components/units/UnitsGameSession';
+import { UnitsSummary } from './components/units/UnitsSummary';
+import { UnitsStatsView } from './components/units/UnitsStatsView';
+
 export function App() {
-  // Global suite navigation: 'hub' (landing page) | 'verbs' | 'math' | 'multi' | 'squares'
-  const [activeGame, setActiveGame] = useState<'hub' | 'verbs' | 'math' | 'multi' | 'squares'>('hub');
+  // Global suite navigation: 'hub' (landing page) | 'verbs' | 'math' | 'multi' | 'squares' | 'units'
+  const [activeGame, setActiveGame] = useState<'hub' | 'verbs' | 'math' | 'multi' | 'squares' | 'units'>('hub');
 
   // ==========================================
   // VERBS GAME STATE
@@ -86,6 +94,15 @@ export function App() {
   const [squaresMode, setSquaresMode] = useState<SquaresSessionMode>('block');
   const [squaresSummary, setSquaresSummary] = useState<SquaresSessionSummary | null>(null);
   const [isSquaresStatsOpen, setIsSquaresStatsOpen] = useState(false);
+
+  // ==========================================
+  // UNITS GAME STATE
+  // ==========================================
+  const [unitsSettings, setUnitsSettings] = useState<UnitSettings>(() => unitsStorage.getSettings());
+  const [isUnitsActive, setIsUnitsActive] = useState(false);
+  const [unitsMode, setUnitsMode] = useState<UnitSessionMode>('block');
+  const [unitsSummary, setUnitsSummary] = useState<UnitSessionSummary | null>(null);
+  const [isUnitsStatsOpen, setIsUnitsStatsOpen] = useState(false);
 
   // Sync sound setting
   useEffect(() => {
@@ -292,6 +309,48 @@ export function App() {
     squaresStorage.saveSettings(newSettings);
   };
 
+  // ==========================================
+  // UNITS HANDLERS
+  // ==========================================
+  const handleStartUnits = (mode: UnitSessionMode) => {
+    setUnitsMode(mode);
+    setIsUnitsActive(true);
+    setUnitsSummary(null);
+    setIsUnitsStatsOpen(false);
+  };
+
+  const handleFinishUnits = (attempts: UnitAttempt[], highestStreak: number, score: number) => {
+    const total = attempts.length;
+    const correctCount = attempts.filter(a => a.isCorrect).length;
+    const accuracy = total > 0 ? Math.round((correctCount / total) * 100) : 0;
+    const totalTimeMs = attempts.reduce((sum, a) => sum + a.timeTakenMs, 0);
+    const avgTimeMs = total > 0 ? Math.round(totalTimeMs / total) : 0;
+
+    const summary: UnitSessionSummary = {
+      id: 'unit_' + Date.now(),
+      timestamp: Date.now(),
+      level: unitsSettings.level,
+      filter: unitsSettings.filter,
+      sessionMode: unitsMode,
+      totalProblems: total,
+      correctCount,
+      accuracy,
+      score,
+      highestStreak,
+      avgTimeMs,
+      attempts,
+    };
+
+    unitsStorage.saveSession(summary);
+    setUnitsSummary(summary);
+    setIsUnitsActive(false);
+  };
+
+  const handleUpdateUnitsSettings = (newSettings: UnitSettings) => {
+    setUnitsSettings(newSettings);
+    unitsStorage.saveSettings(newSettings);
+  };
+
   const totalVerbScore = verbSessions.reduce((sum, s) => sum + s.score, 0);
   const totalVerbMastered = Object.values(verbStats).filter(
     s => (s.timesFlawless >= 2 && s.timesFailed === 0) || s.timesFlawless >= 3
@@ -319,6 +378,10 @@ export function App() {
               setIsSquaresActive(false);
               setSquaresSummary(null);
               setIsSquaresStatsOpen(false);
+            } else if (game === 'units') {
+              setIsUnitsActive(false);
+              setUnitsSummary(null);
+              setIsUnitsStatsOpen(false);
             }
           }}
         />
@@ -699,6 +762,47 @@ export function App() {
               onUpdateSettings={handleUpdateSquaresSettings}
               onStartGame={handleStartSquares}
               onOpenStats={() => setIsSquaresStatsOpen(true)}
+              onBackToHub={() => setActiveGame('hub')}
+            />
+          )}
+        </main>
+      )}
+
+      {/* 6. UNITS GAME VIEW */}
+      {activeGame === 'units' && (
+        <main className="flex-1 pb-16">
+          {isUnitsActive ? (
+            <UnitsGameSession
+              settings={unitsSettings}
+              mode={unitsMode}
+              onFinish={handleFinishUnits}
+              onQuit={() => {
+                if (window.confirm('¿Salir del juego de cambio de unidades?')) {
+                  setIsUnitsActive(false);
+                }
+              }}
+            />
+          ) : unitsSummary ? (
+            <UnitsSummary
+              summary={unitsSummary}
+              onPlayAgain={() => handleStartUnits(unitsMode)}
+              onViewStats={() => {
+                setUnitsSummary(null);
+                setIsUnitsStatsOpen(true);
+              }}
+              onBackToHub={() => setActiveGame('hub')}
+            />
+          ) : isUnitsStatsOpen ? (
+            <UnitsStatsView
+              onBackToLobby={() => setIsUnitsStatsOpen(false)}
+              onStartGame={() => handleStartUnits('block')}
+            />
+          ) : (
+            <UnitsLobby
+              settings={unitsSettings}
+              onUpdateSettings={handleUpdateUnitsSettings}
+              onStartGame={handleStartUnits}
+              onOpenStats={() => setIsUnitsStatsOpen(true)}
               onBackToHub={() => setActiveGame('hub')}
             />
           )}
