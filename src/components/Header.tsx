@@ -9,6 +9,7 @@ interface HeaderProps {
   difficultCount: number;
   soundEnabled: boolean;
   onToggleSound: () => void;
+  onBackToHub?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -18,23 +19,37 @@ export const Header: React.FC<HeaderProps> = ({
   difficultCount,
   soundEnabled,
   onToggleSound,
+  onBackToHub,
 }) => {
   return (
     <header className="bg-white/80 backdrop-blur-md sticky top-0 z-40 border-b border-indigo-100 shadow-sm">
       <div className="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-        {/* Brand */}
-        <div 
-          onClick={() => onSelectTab('game')}
-          className="flex items-center gap-2.5 cursor-pointer group select-none"
-        >
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-white shadow-md shadow-indigo-200 group-hover:scale-105 transition-transform">
-            <Sparkles className="w-5 h-5 text-yellow-200 animate-pulse" />
-          </div>
-          <div>
-            <h1 className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-              VerbMaster Jr.
-            </h1>
-            <p className="text-xs text-slate-500 font-semibold">Repaso de Verbos Irregulares</p>
+        {/* Brand & Back to Hub */}
+        <div className="flex items-center gap-3">
+          {onBackToHub && (
+            <button
+              onClick={onBackToHub}
+              className="text-xs font-black text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-xl border border-indigo-200 transition-all active:scale-95 flex items-center gap-1.5"
+              title="Volver al menú de juegos"
+            >
+              <span>🏠</span>
+              <span>Menú Suite</span>
+            </button>
+          )}
+
+          <div 
+            onClick={() => onSelectTab('game')}
+            className="flex items-center gap-2.5 cursor-pointer group select-none"
+          >
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-white shadow-md shadow-indigo-200 group-hover:scale-105 transition-transform">
+              <Sparkles className="w-5 h-5 text-yellow-200 animate-pulse" />
+            </div>
+            <div>
+              <h1 className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                VerbMaster Jr.
+              </h1>
+              <p className="text-xs text-slate-500 font-semibold">Repaso de Verbos Irregulares</p>
+            </div>
           </div>
         </div>
 
