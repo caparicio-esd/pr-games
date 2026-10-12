@@ -3,9 +3,11 @@ import { VERBS_DATA } from './data/verbs';
 import { Verb, VerbAttempt, RoundSessionSummary, UserSettings, Achievement } from './types';
 import { MathSettings, MathGameMode, MathAttempt, MathSessionSummary } from './types/math';
 import { MultiSettings, MultiSessionMode, MultiAttempt, MultiSessionSummary } from './types/multiplication';
+import { SquaresSettings, SquaresSessionMode, SquaresAttempt, SquaresSessionSummary } from './types/squares';
 import { storage } from './services/storage';
 import { mathStorage } from './services/mathStorage';
 import { multiStorage } from './services/multiplicationStorage';
+import { squaresStorage } from './services/squaresStorage';
 import { audio } from './utils/audio';
 
 // Hub
@@ -33,9 +35,15 @@ import { MultiGameSession } from './components/multiplication/MultiGameSession';
 import { MultiSummary } from './components/multiplication/MultiSummary';
 import { MultiStatsView } from './components/multiplication/MultiStatsView';
 
+// Squares Game Components
+import { SquaresLobby } from './components/squares/SquaresLobby';
+import { SquaresGameSession } from './components/squares/SquaresGameSession';
+import { SquaresSummary } from './components/squares/SquaresSummary';
+import { SquaresStatsView } from './components/squares/SquaresStatsView';
+
 export function App() {
-  // Global suite navigation: 'hub' (landing page) | 'verbs' | 'math' | 'multi'
-  const [activeGame, setActiveGame] = useState<'hub' | 'verbs' | 'math' | 'multi'>('hub');
+  // Global suite navigation: 'hub' (landing page) | 'verbs' | 'math' | 'multi' | 'squares'
+  const [activeGame, setActiveGame] = useState<'hub' | 'verbs' | 'math' | 'multi' | 'squares'>('hub');
 
   // ==========================================
   // VERBS GAME STATE
@@ -69,6 +77,15 @@ export function App() {
   const [multiMode, setMultiMode] = useState<MultiSessionMode>('block');
   const [multiSummary, setMultiSummary] = useState<MultiSessionSummary | null>(null);
   const [isMultiStatsOpen, setIsMultiStatsOpen] = useState(false);
+
+  // ==========================================
+  // SQUARES GAME STATE
+  // ==========================================
+  const [squaresSettings, setSquaresSettings] = useState<SquaresSettings>(() => squaresStorage.getSettings());
+  const [isSquaresActive, setIsSquaresActive] = useState(false);
+  const [squaresMode, setSquaresMode] = useState<SquaresSessionMode>('block');
+  const [squaresSummary, setSquaresSummary] = useState<SquaresSessionSummary | null>(null);
+  const [isSquaresStatsOpen, setIsSquaresStatsOpen] = useState(false);
 
   // Sync sound setting
   useEffect(() => {
@@ -233,6 +250,48 @@ export function App() {
     multiStorage.saveSettings(newSettings);
   };
 
+  // ==========================================
+  // SQUARES HANDLERS
+  // ==========================================
+  const handleStartSquares = (mode: SquaresSessionMode) => {
+    setSquaresMode(mode);
+    setIsSquaresActive(true);
+    setSquaresSummary(null);
+    setIsSquaresStatsOpen(false);
+  };
+
+  const handleFinishSquares = (attempts: SquaresAttempt[], highestStreak: number, score: number) => {
+    const total = attempts.length;
+    const correctCount = attempts.filter(a => a.isCorrect).length;
+    const accuracy = total > 0 ? Math.round((correctCount / total) * 100) : 0;
+    const totalTimeMs = attempts.reduce((sum, a) => sum + a.timeTakenMs, 0);
+    const avgTimeMs = total > 0 ? Math.round(totalTimeMs / total) : 0;
+
+    const summary: SquaresSessionSummary = {
+      id: 'sq_' + Date.now(),
+      timestamp: Date.now(),
+      level: squaresSettings.level,
+      questionMode: squaresSettings.questionMode,
+      sessionMode: squaresMode,
+      totalProblems: total,
+      correctCount,
+      accuracy,
+      score,
+      highestStreak,
+      avgTimeMs,
+      attempts,
+    };
+
+    squaresStorage.saveSession(summary);
+    setSquaresSummary(summary);
+    setIsSquaresActive(false);
+  };
+
+  const handleUpdateSquaresSettings = (newSettings: SquaresSettings) => {
+    setSquaresSettings(newSettings);
+    squaresStorage.saveSettings(newSettings);
+  };
+
   const totalVerbScore = verbSessions.reduce((sum, s) => sum + s.score, 0);
   const totalVerbMastered = Object.values(verbStats).filter(
     s => (s.timesFlawless >= 2 && s.timesFailed === 0) || s.timesFlawless >= 3
@@ -256,6 +315,10 @@ export function App() {
               setIsMultiActive(false);
               setMultiSummary(null);
               setIsMultiStatsOpen(false);
+            } else if (game === 'squares') {
+              setIsSquaresActive(false);
+              setSquaresSummary(null);
+              setIsSquaresStatsOpen(false);
             }
           }}
         />
@@ -595,6 +658,47 @@ export function App() {
               onUpdateSettings={handleUpdateMultiSettings}
               onStartGame={handleStartMulti}
               onOpenStats={() => setIsMultiStatsOpen(true)}
+              onBackToHub={() => setActiveGame('hub')}
+            />
+          )}
+        </main>
+      )}
+
+      {/* 5. SQUARES GAME VIEW */}
+      {activeGame === 'squares' && (
+        <main className="flex-1 pb-16">
+          {isSquaresActive ? (
+            <SquaresGameSession
+              settings={squaresSettings}
+              mode={squaresMode}
+              onFinish={handleFinishSquares}
+              onQuit={() => {
+                if (window.confirm('¿Salir del juego de cuadrados perfectos?')) {
+                  setIsSquaresActive(false);
+                }
+              }}
+            />
+          ) : squaresSummary ? (
+            <SquaresSummary
+              summary={squaresSummary}
+              onPlayAgain={() => handleStartSquares(squaresMode)}
+              onViewStats={() => {
+                setSquaresSummary(null);
+                setIsSquaresStatsOpen(true);
+              }}
+              onBackToHub={() => setActiveGame('hub')}
+            />
+          ) : isSquaresStatsOpen ? (
+            <SquaresStatsView
+              onBackToLobby={() => setIsSquaresStatsOpen(false)}
+              onStartGame={() => handleStartSquares('block')}
+            />
+          ) : (
+            <SquaresLobby
+              settings={squaresSettings}
+              onUpdateSettings={handleUpdateSquaresSettings}
+              onStartGame={handleStartSquares}
+              onOpenStats={() => setIsSquaresStatsOpen(true)}
               onBackToHub={() => setActiveGame('hub')}
             />
           )}

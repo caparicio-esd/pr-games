@@ -3,9 +3,10 @@ import { Sparkles, ArrowRight, Zap, Trophy, Flame } from 'lucide-react';
 import { storage } from '../services/storage';
 import { mathStorage } from '../services/mathStorage';
 import { multiStorage } from '../services/multiplicationStorage';
+import { squaresStorage } from '../services/squaresStorage';
 
 interface SuiteHubProps {
-  onSelectGame: (game: 'verbs' | 'math' | 'multi') => void;
+  onSelectGame: (game: 'verbs' | 'math' | 'multi' | 'squares') => void;
 }
 
 export const SuiteHub: React.FC<SuiteHubProps> = ({ onSelectGame }) => {
@@ -13,6 +14,7 @@ export const SuiteHub: React.FC<SuiteHubProps> = ({ onSelectGame }) => {
   const verbStats = storage.getVerbStats();
   const mathOverview = mathStorage.getOverview();
   const multiOverview = multiStorage.getOverview();
+  const squaresOverview = squaresStorage.getOverview();
 
   const verbsMastered = Object.values(verbStats).filter(
     s => (s.timesFlawless >= 2 && s.timesFailed === 0) || s.timesFlawless >= 3
@@ -23,8 +25,13 @@ export const SuiteHub: React.FC<SuiteHubProps> = ({ onSelectGame }) => {
     t => t.percent >= 85 && t.total >= 5
   ).length;
 
+  // Squares mastered (percent >= 85 and total >= 5)
+  const squaresMasteredCount = Object.values(squaresOverview.masteryByNumber).filter(
+    s => s.percent >= 85 && s.total >= 5
+  ).length;
+
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10 space-y-10 animate-pop">
+    <div className="max-w-6xl mx-auto px-4 py-10 space-y-10 animate-pop">
       {/* Brand Header */}
       <div className="text-center space-y-3">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-sm border border-indigo-100 shadow-sm text-xs font-black text-indigo-700 uppercase tracking-wider">
@@ -39,8 +46,8 @@ export const SuiteHub: React.FC<SuiteHubProps> = ({ onSelectGame }) => {
         </p>
       </div>
 
-      {/* Game Selection Cards Grid (3 Games) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Game Selection Cards Grid (4 Games) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* GAME 1: VerbMaster Jr. */}
         <div
           onClick={() => onSelectGame('verbs')}
@@ -172,7 +179,52 @@ export const SuiteHub: React.FC<SuiteHubProps> = ({ onSelectGame }) => {
             </div>
           </div>
         </div>
+
+        {/* GAME 4: CuadradosPlay Jr. */}
+        <div
+          onClick={() => onSelectGame('squares')}
+          className="group relative bg-white rounded-3xl p-6 sm:p-7 border-2 border-slate-100 hover:border-purple-400 shadow-xl shadow-slate-100 hover:shadow-purple-100/70 transition-all duration-300 cursor-pointer flex flex-col justify-between overflow-hidden"
+        >
+          <div>
+            <div className="flex items-start justify-between gap-4 mb-5">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-500 via-pink-500 to-indigo-500 flex items-center justify-center text-3xl shadow-lg shadow-purple-200 group-hover:scale-110 transition-transform">
+                📐
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 bg-purple-50 text-purple-700 rounded-full border border-purple-100">
+                Potencias y Raíces
+              </span>
+            </div>
+
+            <h2 className="text-xl sm:text-2xl font-black text-slate-800 mb-2 group-hover:text-purple-600 transition-colors">
+              CuadradosPlay Jr.
+            </h2>
+            <p className="text-slate-500 font-medium text-xs sm:text-sm leading-relaxed mb-5">
+              Aprende los cuadrados perfectos del 2 al 20 (del 4 al 400). Modos directo, raíz cuadrada e inverso por dificultad.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-1.5 mb-5">
+              <span className="inline-flex items-center gap-1 bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-xl text-xs font-bold text-slate-600">
+                <Trophy className="w-3 h-3 text-amber-500" />
+                {squaresMasteredCount} de 19 dominados
+              </span>
+              <span className="inline-flex items-center gap-1 bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-xl text-xs font-bold text-slate-600">
+                <Flame className="w-3 h-3 text-purple-500" />
+                Racha: {squaresOverview.bestStreakAllTime}
+              </span>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-slate-50 flex items-center justify-between">
+            <span className="text-xs font-black uppercase tracking-wider text-purple-600">
+              Jugar a los cuadrados
+            </span>
+            <div className="w-9 h-9 rounded-xl bg-purple-600 group-hover:bg-purple-500 text-white flex items-center justify-center shadow-md shadow-purple-200 group-hover:translate-x-1 transition-all">
+              <ArrowRight className="w-4 h-4" />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
+

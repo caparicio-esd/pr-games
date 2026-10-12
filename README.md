@@ -6,11 +6,12 @@ Una suite interactiva, visual y divertida diseñada para repasar y dominar los v
 
 ---
 
-## 🎮 Los 3 Juegos de la Suite
+## 🎮 Los 4 Juegos de la Suite
 
 ### 1. 🇬🇧 VerbMaster Jr. (Verbos Irregulares en Inglés)
 - Rellena el **Presente**, **Pasado** y **Participio** a partir del significado en español.
 - Pronunciación en voz inglesa nativa (altavoz 🔊).
+- Selector por páginas escolares y rangos alfabéticos (#1 al #N).
 - Bloques de 20 verbos (configurables).
 - Puntuación, rachas (🔥) y confeti.
 - Diccionario interactivo y entrenamiento de verbos difíciles.
@@ -35,9 +36,24 @@ Una suite interactiva, visual y divertida diseñada para repasar y dominar los v
 - **Tabla Pitagórica interactiva de 12x12**: para explorar patrones y cuadrados perfectos.
 - **Termómetro de dominio**: porcentaje de aciertos tabla por tabla (del 1 al 12).
 
+### 4. 📐 CuadradosPlay Jr. (Cuadrados Perfectos del 2 al 20)
+- **4 Niveles de dificultad progresiva**:
+  - **Nivel 1: Del 2 al 5** ($2^2$ a $5^2$, hasta 25).
+  - **Nivel 2: Del 2 al 10** ($2^2$ a $10^2$, hasta 100 - base escolar).
+  - **Nivel 3: Del 2 al 15** ($2^2$ a $15^2$, hasta 225).
+  - **Nivel 4: Del 2 al 20** ($2^2$ a $20^2$, hasta 400 - modo experta).
+- **3 Modos de pregunta**:
+  - **Directo ($n^2 = ?$)**: calcular la potencia (ej. $7^2 = 49$).
+  - **Raíz cuadrada ($\sqrt{S} = ?$)**: identificar la base a partir del cuadrado perfecto (ej. $\sqrt{49} = 7$).
+  - **Mixto**: combinación dinámica de ambos tipos.
+- **Modos de sesión**: Bloques (10, 15, 20 preguntas) y Sprint contrarreloj de 60 segundos.
+- **Tabla de referencia interactiva**: chuleta visual con todos los cuadrados del 2 al 20.
+- **Métricas y dominio**: seguimiento individualizado de cada número del 2 al 20 con corona (👑) al dominarlo.
+
 ---
 
 ## 🚀 Cómo ejecutar en local (Mac)
 
 - Ejecuta `./iniciar.sh` (o haz doble clic en él).
 - O ejecuta `npm run dev` y abre [http://localhost:5173](http://localhost:5173).
+
