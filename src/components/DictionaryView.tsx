@@ -103,9 +103,14 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({ verbs }) => {
           >
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-base font-extrabold text-slate-800">
-                  {verb.spanish}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-black text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-lg border border-indigo-100">
+                    #{verbs.findIndex(v => v.id === verb.id) + 1}
+                  </span>
+                  <span className="text-base font-extrabold text-slate-800">
+                    {verb.spanish}
+                  </span>
+                </div>
                 <div className="flex items-center gap-1.5">
                   <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
                     verb.level === 'easy'

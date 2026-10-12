@@ -18,6 +18,7 @@ import { RoundSummary } from './components/RoundSummary';
 import { StatsView } from './components/StatsView';
 import { DictionaryView } from './components/DictionaryView';
 import { SettingsModal } from './components/SettingsModal';
+import { VerbPageRangeModal } from './components/VerbPageRangeModal';
 import { Play, Sparkles, BookOpen, AlertCircle } from 'lucide-react';
 
 // Math Game Components
@@ -45,6 +46,7 @@ export function App() {
   const [verbStats, setVerbStats] = useState(() => storage.getVerbStats());
   const [verbAchievements, setVerbAchievements] = useState<Achievement[]>(() => storage.getAchievements());
   const [isVerbSettingsOpen, setIsVerbSettingsOpen] = useState(false);
+  const [isPageModalOpen, setIsPageModalOpen] = useState(false);
 
   const [activeRoundVerbs, setActiveRoundVerbs] = useState<Verb[] | null>(null);
   const [activeRoundTitle, setActiveRoundTitle] = useState('Ronda de Verbos');
@@ -342,6 +344,14 @@ export function App() {
                             <span>¡Empezar Ronda ({verbSettings.roundSize > 0 ? `${verbSettings.roundSize} verbos` : 'Todos'})!</span>
                           </button>
 
+                          <button
+                            onClick={() => setIsPageModalOpen(true)}
+                            className="px-6 py-4 bg-yellow-300 hover:bg-yellow-200 text-indigo-950 font-black rounded-2xl shadow-lg transition-all text-sm flex items-center gap-2 active:scale-95"
+                          >
+                            <BookOpen className="w-4 h-4 text-indigo-800" />
+                            <span>📖 Estudiar por Páginas (#1 al #N)</span>
+                          </button>
+
                           {difficultVerbIds.length > 0 && (
                             <button
                               onClick={() => startPracticingDifficultVerbs()}
@@ -493,6 +503,17 @@ export function App() {
               setVerbSessions([]);
               setVerbStats({});
               setVerbAchievements(storage.getAchievements());
+            }}
+          />
+
+          <VerbPageRangeModal
+            isOpen={isPageModalOpen}
+            onClose={() => setIsPageModalOpen(false)}
+            verbs={VERBS_DATA}
+            onStartStudy={(selectedVerbs, title) => {
+              setActiveRoundTitle(title);
+              setActiveRoundVerbs(selectedVerbs);
+              setCompletedVerbSummary(null);
             }}
           />
         </>

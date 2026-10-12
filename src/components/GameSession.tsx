@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Verb, VerbAttempt, UserSettings } from '../types';
+import { VERBS_DATA } from '../data/verbs';
 import { audio } from '../utils/audio';
 import { Volume2, Lightbulb, ArrowRight, Check, X, Flame, Star, HelpCircle, RotateCcw } from 'lucide-react';
 
@@ -292,7 +293,10 @@ export const GameSession: React.FC<GameSessionProps> = ({
         {/* Spanish Word Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-indigo-500 bg-indigo-50 px-3 py-1 rounded-full">
+            <span className="text-xs font-black text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-full border border-indigo-100">
+              #{VERBS_DATA.findIndex(v => v.id === currentVerb.id) + 1}
+            </span>
+            <span className="text-xs font-bold uppercase tracking-wider text-indigo-500 bg-indigo-50 px-3 py-0.5 rounded-full">
               Significado en Español
             </span>
             {getDifficultyBadge(currentVerb.level)}
